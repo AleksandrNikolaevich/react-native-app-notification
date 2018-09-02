@@ -10,7 +10,7 @@
     "typings": "./dts/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://gitlab.geesys.ru/geesys/web-lib"
+        "url": "https://github.com/AleksandrNikolaevich/react-native-app-notification"
     },
     "devDependencies": {
         "del": "^3.0.0",
