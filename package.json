@@ -10,7 +10,7 @@
     "typings": "./dts/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/AleksandrNikolaevich/react-native-app-notification"
+        "url": "https://github.com/AleksandrNikolaevich/react-native-app-notification.git"
     },
     "devDependencies": {
         "del": "^3.0.0",
