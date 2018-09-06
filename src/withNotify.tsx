@@ -6,12 +6,13 @@ export declare type WithNotify = {
     notify: (params: NotifyParams)=>void
 }
 
+const contextTypes = {
+    showNotify: PropTypes.func
+};
+
 const withNotify = function<T>(WrappedComponent: React.ComponentType<T & WithNotify>): React.ComponentType<T & WithNotify> {
     class Wrapper extends React.PureComponent<T & WithNotify, {}>{
-        static contextTypes = {
-            showNotify: PropTypes.func
-        };
-
+        static contextTypes = contextTypes;
 
         render(){
             return(
@@ -26,6 +27,14 @@ const withNotify = function<T>(WrappedComponent: React.ComponentType<T & WithNot
         // @ts-ignore
         Wrapper[key] = WrappedComponent[key]
     })
+
+    if(WrappedComponent.contextTypes){
+        Wrapper.contextTypes = {
+            ...WrappedComponent.contextTypes,
+            ...contextTypes
+        }
+    }
+
     return Wrapper;
 }
 export default withNotify

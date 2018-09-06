@@ -30,6 +30,9 @@ define(["require", "exports", "react", "prop-types"], function (require, exports
     Object.defineProperty(exports, "__esModule", { value: true });
     react_1 = __importDefault(react_1);
     prop_types_1 = __importDefault(prop_types_1);
+    var contextTypes = {
+        showNotify: prop_types_1.default.func
+    };
     var withNotify = function (WrappedComponent) {
         var Wrapper = /** @class */ (function (_super) {
             __extends(Wrapper, _super);
@@ -39,15 +42,16 @@ define(["require", "exports", "react", "prop-types"], function (require, exports
             Wrapper.prototype.render = function () {
                 return (react_1.default.createElement(WrappedComponent, __assign({}, this.props, { notify: this.context.showNotify })));
             };
-            Wrapper.contextTypes = {
-                showNotify: prop_types_1.default.func
-            };
+            Wrapper.contextTypes = contextTypes;
             return Wrapper;
         }(react_1.default.PureComponent));
         Object.keys(WrappedComponent).forEach(function (key) {
             // @ts-ignore
             Wrapper[key] = WrappedComponent[key];
         });
+        if (WrappedComponent.contextTypes) {
+            Wrapper.contextTypes = __assign({}, WrappedComponent.contextTypes, contextTypes);
+        }
         return Wrapper;
     };
     exports.default = withNotify;

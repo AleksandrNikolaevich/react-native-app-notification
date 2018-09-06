@@ -24,6 +24,9 @@ var __assign = (this && this.__assign) || function () {
 };
 import React from "react";
 import PropTypes from "prop-types";
+var contextTypes = {
+    showNotify: PropTypes.func
+};
 var withNotify = function (WrappedComponent) {
     var Wrapper = /** @class */ (function (_super) {
         __extends(Wrapper, _super);
@@ -33,15 +36,16 @@ var withNotify = function (WrappedComponent) {
         Wrapper.prototype.render = function () {
             return (React.createElement(WrappedComponent, __assign({}, this.props, { notify: this.context.showNotify })));
         };
-        Wrapper.contextTypes = {
-            showNotify: PropTypes.func
-        };
+        Wrapper.contextTypes = contextTypes;
         return Wrapper;
     }(React.PureComponent));
     Object.keys(WrappedComponent).forEach(function (key) {
         // @ts-ignore
         Wrapper[key] = WrappedComponent[key];
     });
+    if (WrappedComponent.contextTypes) {
+        Wrapper.contextTypes = __assign({}, WrappedComponent.contextTypes, contextTypes);
+    }
     return Wrapper;
 };
 export default withNotify;
