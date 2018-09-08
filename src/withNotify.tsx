@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { NotifyParams } from "./Notification";
-
+import hoistNonReactStatics from "hoist-non-react-statics";
 export declare type WithNotify = {
     notify: (params: NotifyParams)=>void
 }
@@ -23,18 +23,7 @@ const withNotify = function<T>(WrappedComponent: React.ComponentType<T & WithNot
             )
         }
     }
-    Object.keys(WrappedComponent).forEach((key)=>{
-        // @ts-ignore
-        Wrapper[key] = WrappedComponent[key]
-    })
 
-    if(WrappedComponent.contextTypes){
-        Wrapper.contextTypes = {
-            ...WrappedComponent.contextTypes,
-            ...contextTypes
-        }
-    }
-
-    return Wrapper;
+    return hoistNonReactStatics(Wrapper, WrappedComponent);
 }
 export default withNotify

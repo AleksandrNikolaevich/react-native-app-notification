@@ -24,6 +24,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import React from "react";
 import PropTypes from "prop-types";
+import hoistNonReactStatics from "hoist-non-react-statics";
 var contextTypes = {
     showNotify: PropTypes.func
 };
@@ -39,13 +40,6 @@ var withNotify = function (WrappedComponent) {
         Wrapper.contextTypes = contextTypes;
         return Wrapper;
     }(React.PureComponent));
-    Object.keys(WrappedComponent).forEach(function (key) {
-        // @ts-ignore
-        Wrapper[key] = WrappedComponent[key];
-    });
-    if (WrappedComponent.contextTypes) {
-        Wrapper.contextTypes = __assign({}, WrappedComponent.contextTypes, contextTypes);
-    }
-    return Wrapper;
+    return hoistNonReactStatics(Wrapper, WrappedComponent);
 };
 export default withNotify;

@@ -25,11 +25,12 @@ var __assign = (this && this.__assign) || function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "react", "prop-types"], function (require, exports, react_1, prop_types_1) {
+define(["require", "exports", "react", "prop-types", "hoist-non-react-statics"], function (require, exports, react_1, prop_types_1, hoist_non_react_statics_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     react_1 = __importDefault(react_1);
     prop_types_1 = __importDefault(prop_types_1);
+    hoist_non_react_statics_1 = __importDefault(hoist_non_react_statics_1);
     var contextTypes = {
         showNotify: prop_types_1.default.func
     };
@@ -45,14 +46,7 @@ define(["require", "exports", "react", "prop-types"], function (require, exports
             Wrapper.contextTypes = contextTypes;
             return Wrapper;
         }(react_1.default.PureComponent));
-        Object.keys(WrappedComponent).forEach(function (key) {
-            // @ts-ignore
-            Wrapper[key] = WrappedComponent[key];
-        });
-        if (WrappedComponent.contextTypes) {
-            Wrapper.contextTypes = __assign({}, WrappedComponent.contextTypes, contextTypes);
-        }
-        return Wrapper;
+        return hoist_non_react_statics_1.default(Wrapper, WrappedComponent);
     };
     exports.default = withNotify;
 });

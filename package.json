@@ -19,5 +19,8 @@
         "gulp-typescript": "^5.0.0-alpha.3",
         "run-sequence": "^2.2.1",
         "tslint": "^5.11.0"
+    },
+    "dependencies": {
+        "hoist-non-react-statics": "^3.0.1"
     }
 }
