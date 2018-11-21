@@ -81,13 +81,15 @@ import PropTypes from "prop-types";
     }
 }); */
 
+export type NotificationColors = {
+    info?: string,
+    success?: string,
+    error?: string,
+    warn?: string
+}
+
 type Props = {
-    colors?: {
-        info?: string,
-        success?: string,
-        error?: string,
-        warn?: string
-    }
+    colors?: NotificationColors
 }
 
 export type NotifyParams = {

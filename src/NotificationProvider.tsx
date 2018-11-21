@@ -3,9 +3,13 @@ import PropTypes from "prop-types";
 import {
     View
 } from "react-native";
-import Notification, { NotifyParams } from "./Notification";
+import Notification, { NotifyParams, NotificationColors } from "./Notification";
 
-class NotificationProvider extends React.PureComponent{
+type NotificationProviderProps = {
+    colors?: NotificationColors
+}
+
+class NotificationProvider extends React.PureComponent<NotificationProviderProps,{}>{
 
     static childContextTypes = {
         showNotify: PropTypes.func

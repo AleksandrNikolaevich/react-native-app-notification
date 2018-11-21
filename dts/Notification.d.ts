@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Animated } from 'react-native';
+export declare type NotificationColors = {
+    info?: string;
+    success?: string;
+    error?: string;
+    warn?: string;
+};
 declare type Props = {
-    colors?: {
-        info?: string;
-        success?: string;
-        error?: string;
-        warn?: string;
-    };
+    colors?: NotificationColors;
 };
 export declare type NotifyParams = {
     timeout?: number;
