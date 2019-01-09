@@ -7,9 +7,7 @@ import {
     Platform,
     PanResponder,
     Text,
-    TextInput,
-    PanResponderStatic,
-    PanResponderInstance,
+    Dimensions
 } from 'react-native';
 //import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { AlertTypes } from './AlertTypes';
@@ -108,8 +106,12 @@ type State = {
 
 //default height notify panel
 const height = 60;
-//TODO: add padding for iPhone X
-const paddingTop = Platform.select({ ios: 20, android: 0 });
+
+const IPHONE_X_HEIGHT = [812, 896];
+
+const deviceHeight = Dimensions.get("window").height;
+
+const paddingTop = Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight)? 40 : 20, android: 0 });
 
 
 class Notification extends React.PureComponent<Props, State> {

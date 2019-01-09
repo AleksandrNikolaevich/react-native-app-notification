@@ -35,8 +35,9 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
     React = __importStar(React);
     //default height notify panel
     var height = 60;
-    //TODO: add padding for iPhone X
-    var paddingTop = react_native_1.Platform.select({ ios: 20, android: 0 });
+    var IPHONE_X_HEIGHT = [812, 896];
+    var deviceHeight = react_native_1.Dimensions.get("window").height;
+    var paddingTop = react_native_1.Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
     var Notification = /** @class */ (function (_super) {
         __extends(Notification, _super);
         function Notification(props) {

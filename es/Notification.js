@@ -23,13 +23,14 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import * as React from 'react';
-import { StyleSheet, Animated, Easing, View, Platform, PanResponder, Text, } from 'react-native';
+import { StyleSheet, Animated, Easing, View, Platform, PanResponder, Text, Dimensions } from 'react-native';
 //import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { AlertTypes } from './AlertTypes';
 //default height notify panel
 var height = 60;
-//TODO: add padding for iPhone X
-var paddingTop = Platform.select({ ios: 20, android: 0 });
+var IPHONE_X_HEIGHT = [812, 896];
+var deviceHeight = Dimensions.get("window").height;
+var paddingTop = Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
 var Notification = /** @class */ (function (_super) {
     __extends(Notification, _super);
     function Notification(props) {
