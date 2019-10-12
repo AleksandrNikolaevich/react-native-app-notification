@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Animated } from 'react-native';
+import { Animated, ViewStyle } from 'react-native';
 export declare type NotificationColors = {
     info?: string;
     success?: string;
     error?: string;
     warn?: string;
 };
-declare type Props = {
+export declare type NotificationProps = {
     colors?: NotificationColors;
+    containerStyle?: ViewStyle;
 };
 export declare type NotifyParams = {
     timeout?: number;
@@ -20,14 +21,14 @@ declare type State = {
     params: NotifyParams;
     grant?: boolean;
 };
-declare class Notification extends React.PureComponent<Props, State> {
-    static defaultProps: Partial<Props>;
+declare class Notification extends React.PureComponent<NotificationProps, State> {
+    static defaultProps: Partial<NotificationProps>;
     initState: NotifyParams;
     timer: any;
     layoutPanResponder: any;
     offsetMoveY: number;
     prevGestureState: any;
-    constructor(props: Props);
+    constructor(props: NotificationProps);
     componentWillMount(): void;
     _swiping(newPos: number): void;
     hide(speed?: number): void;

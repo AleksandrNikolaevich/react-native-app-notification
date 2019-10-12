@@ -7,77 +7,11 @@ import {
     Platform,
     PanResponder,
     Text,
-    Dimensions
+    Dimensions,
+    ViewStyle
 } from 'react-native';
 //import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { AlertTypes } from './AlertTypes';
-import PropTypes from "prop-types";
-/* const Button = React.createClass({
-    propTypes: {
-        icon: React.PropTypes.func,
-        action: React.PropTypes.func,
-        iconStyle: React.PropTypes.object,
-        buttonStyle: React.PropTypes.object,
-        positionIcon: React.PropTypes.oneOf(['left', 'right']),
-        caption: React.PropTypes.string,
-        hideAlert: React.PropTypes.func,
-    },
-
-    getDefaultProps: function() {
-        return {
-            icon: ()=>{return null;},
-            action: ()=>{},
-            iconStyle: {
-                width: 25,
-                height: 25,
-            },
-            buttonStyle: {
-
-            },
-            positionIcon: 'left'
-        };
-    },
-    renderCaption: function () {
-        if(this.props.caption){
-            return <Text style={[style.text]}>{this.props.caption}</Text>
-        }
-         return null;
-    },
-    renderIcon:function (position) {
-        if(this.props.icon() && this.props.positionIcon === position){
-            return  <Image
-                style={[this.props.iconStyle]}
-                resizeMode={'stretch'}
-                source={this.props.icon()}
-            />
-        }
-        return null;
-    },
-    render:function () {
-        return <TouchableOpacity
-            style = {[{
-                paddingHorizontal: 10,
-                marginHorizontal: 10,
-                flexDirection: 'row',
-                backgroundColor: 'rgb(198, 19, 48)',
-                alignItems:'center',
-                alignSelf:'center'
-            }, this.props.buttonStyle]}
-            onPress={() => {
-                if(this.props.hideAlert)
-                    this.props.hideAlert();
-                this.props.action();
-            }}
-            underlayColor={"transparent"}
-        >
-            {this.renderIcon('left')}
-            {this.renderCaption()}
-            {this.renderIcon('right')}
-
-
-        </TouchableOpacity>;
-    }
-}); */
 
 export type NotificationColors = {
     info?: string,
@@ -86,8 +20,9 @@ export type NotificationColors = {
     warn?: string
 }
 
-type Props = {
-    colors?: NotificationColors
+export type NotificationProps = {
+    colors?: NotificationColors,
+    containerStyle?: ViewStyle
 }
 
 export type NotifyParams = {
@@ -95,7 +30,7 @@ export type NotifyParams = {
     message: string,
     type?: "success" | "error" | "warn" | "info",
     onPress?: () => void,
-    
+
 }
 
 type State = {
@@ -104,19 +39,17 @@ type State = {
     grant?: boolean
 }
 
-//default height notify panel
-const height = 60;
-
 const IPHONE_X_HEIGHT = [812, 896];
 
 const deviceHeight = Dimensions.get("window").height;
 
-const paddingTop = Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight)? 40 : 20, android: 0 });
+const paddingTop = Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
 
+const maxHeight = deviceHeight / 2;
+const minHeight = 60
+class Notification extends React.PureComponent<NotificationProps, State> {
 
-class Notification extends React.PureComponent<Props, State> {
-
-    public static defaultProps: Partial<Props> = {
+    public static defaultProps: Partial<NotificationProps> = {
         colors: {
             info: '#4671ff',
             success: '#0cd8ab',
@@ -141,15 +74,15 @@ class Notification extends React.PureComponent<Props, State> {
         onPress: () => { }
     }
 
-    timer:any;
+    timer: any;
     layoutPanResponder: any;
     offsetMoveY: number = 0;
     prevGestureState: any;
 
-    constructor(props: Props) {
+    constructor(props: NotificationProps) {
         super(props);
         this.state = {
-            top: new Animated.Value(-(height + paddingTop)),
+            top: new Animated.Value(-maxHeight),
             params: this.initState
         };
     }
@@ -167,13 +100,13 @@ class Notification extends React.PureComponent<Props, State> {
 
             },
             onPanResponderRelease: (e, gesture) => {
-                this.setState({grant: false})
+                this.setState({ grant: false })
                 if (Math.abs(this.offsetMoveY) > 10) {
                     this.hide(20);
                 } else {
                     this._swiping(0);
                     if (Math.abs(this.offsetMoveY) < 3) {
-                        this.timer = setTimeout(()=>{this.hide()}, 100);
+                        this.timer = setTimeout(() => { this.hide() }, 100);
                         this.state.params.onPress && this.state.params.onPress();
                     }
 
@@ -181,7 +114,7 @@ class Notification extends React.PureComponent<Props, State> {
                 this.offsetMoveY = 0;
             },
             onPanResponderGrant: (e, gesture) => {
-                this.setState({grant: true})
+                this.setState({ grant: true })
                 clearTimeout(this.timer);
                 this.prevGestureState = {
                     ...gesture,
@@ -200,9 +133,9 @@ class Notification extends React.PureComponent<Props, State> {
         }).start();
     }
 
-    hide(speed = 200) {
+    hide(speed = 300) {
         Animated.timing(this.state.top, {
-            toValue: -(height + paddingTop),
+            toValue: -maxHeight,
             duration: speed,
         }).start(() => {
             this.setState({ params: this.initState })
@@ -212,12 +145,12 @@ class Notification extends React.PureComponent<Props, State> {
     show(params: NotifyParams) {
 
         clearTimeout(this.timer);
-        this.state.top.setValue(-(height + paddingTop));
+        this.state.top.setValue(-maxHeight);
         this.setState({ params: { ...this.initState, ...params } }, () => {
             Animated.timing(this.state.top, {
                 toValue: 0,
-                duration: 300,
-                easing: Easing.bounce,
+                duration: 400,
+                easing: Easing.sin,
             }).start(() => {
                 this.timer = setTimeout(() => { this.hide() }, this.state.params.timeout);
             });
@@ -264,39 +197,35 @@ class Notification extends React.PureComponent<Props, State> {
     } */
 
     render() {
-        const {grant} = this.state;
+        const { grant } = this.state;
+        const { containerStyle } = this.props;
         return (
             <Animated.View
                 style={[
                     style.container,
                     {
+                        maxHeight,
+                        minHeight,
                         backgroundColor: this.getColor(),
-                        top: this.state.top
+                        top: this.state.top,
+                        opacity: this.state.top.interpolate({
+                            inputRange: [-150, 0],
+                            outputRange: [0, 1]
+                        })
                     },
-                    grant && {opacity: .9}
+                    grant && { opacity: .9 },
+                    containerStyle
                 ]}
                 {...this.layoutPanResponder.panHandlers}
             >
                 <View
                     style={style.content}
                 >
-                    {/* <TextInput style={[
-                        style.text
-                    ]}
-                    multiline
-                    editable={false}
-                    value={this.state.params.message}
-                    underlineColorAndroid={'transparent'}
-                    /> */}
-                    <View style={{flex:1}}>
-                        <Text
-                            style={[
-                                style.text
-                            ]}
-                        >{this.state.params.message}</Text>
-                    </View>
-
-                    {/* this.renderContent() */}
+                    <Text
+                        style={[
+                            style.text
+                        ]}
+                    >{this.state.params.message}</Text>
                 </View>
                 <View style={style.swipeButton}></View>
             </Animated.View>
@@ -320,9 +249,10 @@ const style = StyleSheet.create({
     },
     content: {
         flex: 1,
+        justifyContent: 'center'
         //flexDirection: 'row',
-       /*  paddingHorizontal: 12,
-        paddingVertical: 12 */
+        /*  paddingHorizontal: 12,
+         paddingVertical: 12 */
     },
     text: {
         fontSize: 16,

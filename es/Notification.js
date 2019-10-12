@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -26,11 +26,11 @@ import * as React from 'react';
 import { StyleSheet, Animated, Easing, View, Platform, PanResponder, Text, Dimensions } from 'react-native';
 //import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { AlertTypes } from './AlertTypes';
-//default height notify panel
-var height = 60;
 var IPHONE_X_HEIGHT = [812, 896];
 var deviceHeight = Dimensions.get("window").height;
 var paddingTop = Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
+var maxHeight = deviceHeight / 2;
+var minHeight = 60;
 var Notification = /** @class */ (function (_super) {
     __extends(Notification, _super);
     function Notification(props) {
@@ -51,7 +51,7 @@ var Notification = /** @class */ (function (_super) {
         };
         _this.offsetMoveY = 0;
         _this.state = {
-            top: new Animated.Value(-(height + paddingTop)),
+            top: new Animated.Value(-maxHeight),
             params: _this.initState
         };
         return _this;
@@ -86,7 +86,7 @@ var Notification = /** @class */ (function (_super) {
             onPanResponderGrant: function (e, gesture) {
                 _this.setState({ grant: true });
                 clearTimeout(_this.timer);
-                _this.prevGestureState = __assign({}, gesture, { moveX: gesture.x0, moveY: gesture.y0 });
+                _this.prevGestureState = __assign(__assign({}, gesture), { moveX: gesture.x0, moveY: gesture.y0 });
             }
         });
     };
@@ -99,9 +99,9 @@ var Notification = /** @class */ (function (_super) {
     };
     Notification.prototype.hide = function (speed) {
         var _this = this;
-        if (speed === void 0) { speed = 200; }
+        if (speed === void 0) { speed = 300; }
         Animated.timing(this.state.top, {
-            toValue: -(height + paddingTop),
+            toValue: -maxHeight,
             duration: speed,
         }).start(function () {
             _this.setState({ params: _this.initState });
@@ -110,12 +110,12 @@ var Notification = /** @class */ (function (_super) {
     Notification.prototype.show = function (params) {
         var _this = this;
         clearTimeout(this.timer);
-        this.state.top.setValue(-(height + paddingTop));
-        this.setState({ params: __assign({}, this.initState, params) }, function () {
+        this.state.top.setValue(-maxHeight);
+        this.setState({ params: __assign(__assign({}, this.initState), params) }, function () {
             Animated.timing(_this.state.top, {
                 toValue: 0,
-                duration: 300,
-                easing: Easing.bounce,
+                duration: 400,
+                easing: Easing.sin,
             }).start(function () {
                 _this.timer = setTimeout(function () { _this.hide(); }, _this.state.params.timeout);
             });
@@ -158,19 +158,26 @@ var Notification = /** @class */ (function (_super) {
     } */
     Notification.prototype.render = function () {
         var grant = this.state.grant;
+        var containerStyle = this.props.containerStyle;
         return (React.createElement(Animated.View, __assign({ style: [
                 style.container,
                 {
+                    maxHeight: maxHeight,
+                    minHeight: minHeight,
                     backgroundColor: this.getColor(),
-                    top: this.state.top
+                    top: this.state.top,
+                    opacity: this.state.top.interpolate({
+                        inputRange: [-150, 0],
+                        outputRange: [0, 1]
+                    })
                 },
-                grant && { opacity: .9 }
+                grant && { opacity: .9 },
+                containerStyle
             ] }, this.layoutPanResponder.panHandlers),
             React.createElement(View, { style: style.content },
-                React.createElement(View, { style: { flex: 1 } },
-                    React.createElement(Text, { style: [
-                            style.text
-                        ] }, this.state.params.message))),
+                React.createElement(Text, { style: [
+                        style.text
+                    ] }, this.state.params.message)),
             React.createElement(View, { style: style.swipeButton })));
     };
     Notification.defaultProps = {
@@ -199,6 +206,10 @@ var style = StyleSheet.create({
     },
     content: {
         flex: 1,
+        justifyContent: 'center'
+        //flexDirection: 'row',
+        /*  paddingHorizontal: 12,
+         paddingVertical: 12 */
     },
     text: {
         fontSize: 16,

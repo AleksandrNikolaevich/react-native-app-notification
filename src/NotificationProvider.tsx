@@ -3,11 +3,9 @@ import PropTypes from "prop-types";
 import {
     View
 } from "react-native";
-import Notification, { NotifyParams, NotificationColors } from "./Notification";
+import Notification, { NotifyParams, NotificationProps } from "./Notification";
 
-type NotificationProviderProps = {
-    colors?: NotificationColors
-}
+type NotificationProviderProps = NotificationProps
 
 class NotificationProvider extends React.PureComponent<NotificationProviderProps,{}>{
 

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { NotifyParams } from "./Notification";
 export declare type WithNotify = {
     notify: (params: NotifyParams) => void;

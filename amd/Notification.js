@@ -4,7 +4,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -33,11 +33,11 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     React = __importStar(React);
-    //default height notify panel
-    var height = 60;
     var IPHONE_X_HEIGHT = [812, 896];
     var deviceHeight = react_native_1.Dimensions.get("window").height;
     var paddingTop = react_native_1.Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
+    var maxHeight = deviceHeight / 2;
+    var minHeight = 60;
     var Notification = /** @class */ (function (_super) {
         __extends(Notification, _super);
         function Notification(props) {
@@ -58,7 +58,7 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
             };
             _this.offsetMoveY = 0;
             _this.state = {
-                top: new react_native_1.Animated.Value(-(height + paddingTop)),
+                top: new react_native_1.Animated.Value(-maxHeight),
                 params: _this.initState
             };
             return _this;
@@ -93,7 +93,7 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
                 onPanResponderGrant: function (e, gesture) {
                     _this.setState({ grant: true });
                     clearTimeout(_this.timer);
-                    _this.prevGestureState = __assign({}, gesture, { moveX: gesture.x0, moveY: gesture.y0 });
+                    _this.prevGestureState = __assign(__assign({}, gesture), { moveX: gesture.x0, moveY: gesture.y0 });
                 }
             });
         };
@@ -106,9 +106,9 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
         };
         Notification.prototype.hide = function (speed) {
             var _this = this;
-            if (speed === void 0) { speed = 200; }
+            if (speed === void 0) { speed = 300; }
             react_native_1.Animated.timing(this.state.top, {
-                toValue: -(height + paddingTop),
+                toValue: -maxHeight,
                 duration: speed,
             }).start(function () {
                 _this.setState({ params: _this.initState });
@@ -117,12 +117,12 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
         Notification.prototype.show = function (params) {
             var _this = this;
             clearTimeout(this.timer);
-            this.state.top.setValue(-(height + paddingTop));
-            this.setState({ params: __assign({}, this.initState, params) }, function () {
+            this.state.top.setValue(-maxHeight);
+            this.setState({ params: __assign(__assign({}, this.initState), params) }, function () {
                 react_native_1.Animated.timing(_this.state.top, {
                     toValue: 0,
-                    duration: 300,
-                    easing: react_native_1.Easing.bounce,
+                    duration: 400,
+                    easing: react_native_1.Easing.sin,
                 }).start(function () {
                     _this.timer = setTimeout(function () { _this.hide(); }, _this.state.params.timeout);
                 });
@@ -165,19 +165,26 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
         } */
         Notification.prototype.render = function () {
             var grant = this.state.grant;
+            var containerStyle = this.props.containerStyle;
             return (React.createElement(react_native_1.Animated.View, __assign({ style: [
                     style.container,
                     {
+                        maxHeight: maxHeight,
+                        minHeight: minHeight,
                         backgroundColor: this.getColor(),
-                        top: this.state.top
+                        top: this.state.top,
+                        opacity: this.state.top.interpolate({
+                            inputRange: [-150, 0],
+                            outputRange: [0, 1]
+                        })
                     },
-                    grant && { opacity: .9 }
+                    grant && { opacity: .9 },
+                    containerStyle
                 ] }, this.layoutPanResponder.panHandlers),
                 React.createElement(react_native_1.View, { style: style.content },
-                    React.createElement(react_native_1.View, { style: { flex: 1 } },
-                        React.createElement(react_native_1.Text, { style: [
-                                style.text
-                            ] }, this.state.params.message))),
+                    React.createElement(react_native_1.Text, { style: [
+                            style.text
+                        ] }, this.state.params.message)),
                 React.createElement(react_native_1.View, { style: style.swipeButton })));
         };
         Notification.defaultProps = {
@@ -206,6 +213,10 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
         },
         content: {
             flex: 1,
+            justifyContent: 'center'
+            //flexDirection: 'row',
+            /*  paddingHorizontal: 12,
+             paddingVertical: 12 */
         },
         text: {
             fontSize: 16,
