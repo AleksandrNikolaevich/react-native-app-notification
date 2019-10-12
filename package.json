@@ -1,6 +1,6 @@
 {
     "name": "react-native-app-notification",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "main": "lib/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -25,7 +25,6 @@
     "dependencies": {
         "hoist-non-react-statics": "^3.0.1",
         "natives": "^1.1.6",
-        "react-native": "^0.61.2",
         "typescript": "^3.6.4"
     }
 }
