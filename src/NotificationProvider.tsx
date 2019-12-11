@@ -1,37 +1,35 @@
 import * as React from "react";
-import PropTypes from "prop-types";
 import {
     View
 } from "react-native";
-import Notification, { NotifyParams, NotificationProps } from "./Notification";
+import Notification, { NotificationProps } from "./Notification";
+import { NotifyContext } from "./context";
+import { NotifyParams } from "./types";
 
-type NotificationProviderProps = NotificationProps
+type NotificationProviderProps = NotificationProps;
 
-class NotificationProvider extends React.PureComponent<NotificationProviderProps,{}>{
 
-    static childContextTypes = {
-        showNotify: PropTypes.func
-    };
 
-     notification:any;
 
-    getChildContext() {
-        return {
-            showNotify: (params: NotifyParams) => {
-                this.notification.show(params);
-            }
-        };
+const { useRef } = React;
+const NotificationProvider: React.FC<NotificationProviderProps> = ({ children, ...other }) => {
+    const NotificationRef = useRef<{show: (params: NotifyParams)=>void}>(null);
+    const showNotify = (params: NotifyParams) => {
+        NotificationRef.current && NotificationRef.current.show(params);
     }
+    return (
+        <NotifyContext.Provider value={showNotify}>
+            <View style={{ flex: 1 }}>
+                {children}
+                <Notification
+                    ref={NotificationRef}
+                    {...other}
+                />
+            </View>
+        </NotifyContext.Provider>
 
-    render(){
-        return <View style={{flex:1}}>
-            {this.props.children}
-            <Notification
-                ref={c => this.notification = c}
-                {...this.props}
-            />
-        </View>
-    }
+    )
+
 }
 
 export default NotificationProvider;

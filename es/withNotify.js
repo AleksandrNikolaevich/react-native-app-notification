@@ -23,11 +23,8 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import * as React from "react";
-import PropTypes from "prop-types";
+import { NotifyContext } from "./context";
 import hoistNonReactStatics from "hoist-non-react-statics";
-var contextTypes = {
-    showNotify: PropTypes.func
-};
 var withNotify = function (WrappedComponent) {
     var Wrapper = /** @class */ (function (_super) {
         __extends(Wrapper, _super);
@@ -35,9 +32,9 @@ var withNotify = function (WrappedComponent) {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Wrapper.prototype.render = function () {
-            return (React.createElement(WrappedComponent, __assign({}, this.props, { notify: this.context.showNotify })));
+            var _this = this;
+            return (React.createElement(NotifyContext.Consumer, null, function (showNotify) { return (React.createElement(WrappedComponent, __assign({}, _this.props, { notify: showNotify }))); }));
         };
-        Wrapper.contextTypes = contextTypes;
         return Wrapper;
     }(React.PureComponent));
     return hoistNonReactStatics(Wrapper, WrappedComponent);

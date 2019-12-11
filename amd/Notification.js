@@ -1,16 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -29,7 +16,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-define(["require", "exports", "react", "react-native", "./AlertTypes"], function (require, exports, React, react_native_1, AlertTypes_1) {
+define(["require", "exports", "react", "react-native", "./AlertTypes", "./utils"], function (require, exports, React, react_native_1, AlertTypes_1, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     React = __importStar(React);
@@ -38,165 +25,296 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
     var paddingTop = react_native_1.Platform.select({ ios: ~IPHONE_X_HEIGHT.indexOf(deviceHeight) ? 40 : 20, android: 0 });
     var maxHeight = deviceHeight / 2;
     var minHeight = 60;
-    var Notification = /** @class */ (function (_super) {
-        __extends(Notification, _super);
-        function Notification(props) {
-            var _this = _super.call(this, props) || this;
-            /* public static PropTypes: Partial<Props> = {
-                colors: PropTypes.shape({
-                    info: PropTypes.string,
-                    success: PropTypes.string,
-                    warn: PropTypes.string,
-                    error: PropTypes.string
-                })
-            }; */
-            _this.initState = {
-                timeout: 3000,
-                message: '',
-                type: AlertTypes_1.AlertTypes.info,
-                onPress: function () { }
-            };
-            _this.offsetMoveY = 0;
-            _this.state = {
-                top: new react_native_1.Animated.Value(-maxHeight),
-                params: _this.initState
-            };
-            return _this;
-        }
-        Notification.prototype.componentWillMount = function () {
-            var _this = this;
-            this.layoutPanResponder = react_native_1.PanResponder.create({
-                onStartShouldSetPanResponder: function () { return true; },
-                onPanResponderMove: function (e, gesture) {
-                    if (gesture.dy < 0 && Math.abs(gesture.dy) > 3) {
-                        _this.offsetMoveY = gesture.dy;
-                        _this._swiping(gesture.dy);
-                    }
-                    else {
-                        _this.offsetMoveY = 0;
-                    }
-                },
-                onPanResponderRelease: function (e, gesture) {
-                    _this.setState({ grant: false });
-                    if (Math.abs(_this.offsetMoveY) > 10) {
-                        _this.hide(20);
-                    }
-                    else {
-                        _this._swiping(0);
-                        if (Math.abs(_this.offsetMoveY) < 3) {
-                            _this.timer = setTimeout(function () { _this.hide(); }, 100);
-                            _this.state.params.onPress && _this.state.params.onPress();
-                        }
-                    }
-                    _this.offsetMoveY = 0;
-                },
-                onPanResponderGrant: function (e, gesture) {
-                    _this.setState({ grant: true });
-                    clearTimeout(_this.timer);
-                    _this.prevGestureState = __assign(__assign({}, gesture), { moveX: gesture.x0, moveY: gesture.y0 });
-                }
-            });
-        };
-        Notification.prototype._swiping = function (newPos) {
-            react_native_1.Animated.timing(this.state.top, {
-                duration: 0,
-                delay: 0,
-                toValue: newPos,
-            }).start();
-        };
-        Notification.prototype.hide = function (speed) {
-            var _this = this;
-            if (speed === void 0) { speed = 300; }
-            react_native_1.Animated.timing(this.state.top, {
-                toValue: -maxHeight,
-                duration: speed,
-            }).start(function () {
-                _this.setState({ params: _this.initState });
-            });
-        };
-        Notification.prototype.show = function (params) {
-            var _this = this;
-            clearTimeout(this.timer);
-            this.state.top.setValue(-maxHeight);
-            this.setState({ params: __assign(__assign({}, this.initState), params) }, function () {
-                react_native_1.Animated.timing(_this.state.top, {
-                    toValue: 0,
-                    duration: 400,
-                    easing: react_native_1.Easing.sin,
-                }).start(function () {
-                    _this.timer = setTimeout(function () { _this.hide(); }, _this.state.params.timeout);
-                });
-            });
-        };
-        Notification.prototype.componentWillUnmount = function () {
-            clearTimeout(this.timer);
-        };
-        Notification.prototype.getColor = function () {
-            return this.props.colors[this.state.params.type];
-        };
-        /* renderContent() {
-            switch (this.state.params.buttons.length) {
-                case 0:
-                    return <Text style={[
-                        style.text
-                    ]}>{this.state.params.alert}</Text>;
-                    break;
-                case 1:
-                    return <View style={{ flexDirection: 'row' }}>
-                        <Text style={[
-                            style.text, { paddingVertical: 5, flex: 1 }
-                        ]}>
-                            {this.state.params.alert}</Text>
-                        <Button
-                            {...this.state.params.buttons[0]}
-                            hideAlert={() => { clearTimeout(this._timer); this.hide() }}
-                        />
-                    </View>;
-                    break;
-                case 2:
-                    return this.state.params.buttons.map((item, i) => {
-                        return <Button key={i} {...item} hideAlert={() => { clearTimeout(this._timer); this.hide() }} />
-                    });
-                    break;
-    
-            }
-            return null;
-    
-        } */
-        Notification.prototype.render = function () {
-            var grant = this.state.grant;
-            var containerStyle = this.props.containerStyle;
-            return (React.createElement(react_native_1.Animated.View, __assign({ style: [
-                    style.container,
-                    {
-                        maxHeight: maxHeight,
-                        minHeight: minHeight,
-                        backgroundColor: this.getColor(),
-                        top: this.state.top,
-                        opacity: this.state.top.interpolate({
-                            inputRange: [-150, 0],
-                            outputRange: [0, 1]
-                        })
-                    },
-                    grant && { opacity: .9 },
-                    containerStyle
-                ] }, this.layoutPanResponder.panHandlers),
-                React.createElement(react_native_1.View, { style: style.content },
-                    React.createElement(react_native_1.Text, { style: [
-                            style.text
-                        ] }, this.state.params.message)),
-                React.createElement(react_native_1.View, { style: style.swipeButton })));
-        };
-        Notification.defaultProps = {
+    var initState = {
+        timeout: 3000,
+        message: '',
+        type: AlertTypes_1.AlertTypes.info,
+        onPress: function () { }
+    };
+    var useState = React.useState, useEffect = React.useEffect, useRef = React.useRef, useImperativeHandle = React.useImperativeHandle;
+    var timer;
+    var layoutPanResponder;
+    var offsetMoveY = 0;
+    var prevGestureState;
+    var onPress;
+    var Notification = function (props, ref) {
+        var _a = utils_1.useDefaultProps(props, {
             colors: {
                 info: '#4671ff',
                 success: '#0cd8ab',
                 error: '#ff426b',
                 warn: 'rgb(255, 193, 7)'
             }
+        }), colors = _a.colors, containerStyle = _a.containerStyle;
+        var _b = useState(initState.timeout), timeout = _b[0], setShowTimeout = _b[1];
+        var _c = useState(initState.message), message = _c[0], setMessage = _c[1];
+        var _d = useState(initState.type), type = _d[0], setType = _d[1];
+        var _e = useState(false), grant = _e[0], setGrant = _e[1];
+        var _f = useState(new react_native_1.Animated.Value(-maxHeight)), top = _f[0], setTop = _f[1];
+        layoutPanResponder = react_native_1.PanResponder.create({
+            onStartShouldSetPanResponder: function () { return true; },
+            onPanResponderMove: function (e, gesture) {
+                if (gesture.dy < 0 && Math.abs(gesture.dy) > 3) {
+                    offsetMoveY = gesture.dy;
+                    swiping(gesture.dy);
+                }
+                else {
+                    offsetMoveY = 0;
+                }
+            },
+            onPanResponderRelease: function (e, gesture) {
+                setGrant(false);
+                if (Math.abs(offsetMoveY) > 10) {
+                    hide(20);
+                }
+                else {
+                    swiping(0);
+                    if (Math.abs(offsetMoveY) < 3) {
+                        timer = setTimeout(function () { hide(); }, 100);
+                        onPress && onPress();
+                    }
+                }
+                offsetMoveY = 0;
+            },
+            onPanResponderGrant: function (e, gesture) {
+                setGrant(true);
+                clearTimeout(timer);
+                prevGestureState = __assign(__assign({}, gesture), { moveX: gesture.x0, moveY: gesture.y0 });
+            }
+        });
+        useEffect(function () {
+            return function () {
+                clearTimeout(timer);
+            };
+        }, [] //useEffect will run only one time
+        //if you pass a value to array, like this [data] than clearTimeout will run every time this value changes (useEffect re-run)
+        );
+        var swiping = function (newPos) {
+            react_native_1.Animated.timing(top, {
+                duration: 0,
+                delay: 0,
+                toValue: newPos,
+            }).start();
         };
-        return Notification;
-    }(React.PureComponent));
+        var hide = function (speed) {
+            if (speed === void 0) { speed = 300; }
+            react_native_1.Animated.timing(top, {
+                toValue: -maxHeight,
+                duration: speed,
+            }).start(function () {
+                setShowTimeout(initState.timeout);
+                setMessage(initState.message);
+                setType(initState.type);
+            });
+        };
+        var show = function (params) {
+            onPress = params.onPress;
+            clearTimeout(timer);
+            top.setValue(-maxHeight);
+            setShowTimeout(params.timeout || initState.timeout);
+            setMessage(params.message || initState.message);
+            setType(params.type || initState.type);
+            react_native_1.Animated.timing(top, {
+                toValue: 0,
+                duration: 400,
+                easing: react_native_1.Easing.sin,
+            }).start(function () {
+                timer = setTimeout(function () { hide(); }, timeout);
+            });
+        };
+        useImperativeHandle(ref, function () { return ({
+            show: function (params) {
+                show(params);
+            }
+        }); });
+        var getColor = function () {
+            return colors[type];
+        };
+        return (React.createElement(react_native_1.Animated.View, __assign({ style: [
+                style.container,
+                {
+                    maxHeight: maxHeight,
+                    minHeight: minHeight,
+                    backgroundColor: getColor(),
+                    top: top,
+                    opacity: top.interpolate({
+                        inputRange: [-150, 0],
+                        outputRange: [0, 1]
+                    })
+                },
+                grant && { opacity: .9 },
+                containerStyle
+            ] }, layoutPanResponder.panHandlers),
+            React.createElement(react_native_1.View, { style: style.content },
+                React.createElement(react_native_1.Text, { style: [
+                        style.text
+                    ] }, message)),
+            React.createElement(react_native_1.View, { style: style.swipeButton })));
+    };
+    // class Notification extends React.PureComponent<NotificationProps, State> {
+    //     public static defaultProps: Partial<NotificationProps> = {
+    //         colors: {
+    //             info: '#4671ff',
+    //             success: '#0cd8ab',
+    //             error: '#ff426b',
+    //             warn: 'rgb(255, 193, 7)'
+    //         }
+    //     };
+    //     /* public static PropTypes: Partial<Props> = {
+    //         colors: PropTypes.shape({
+    //             info: PropTypes.string,
+    //             success: PropTypes.string,
+    //             warn: PropTypes.string,
+    //             error: PropTypes.string
+    //         })
+    //     }; */
+    //     initState: NotifyParams = {
+    //         timeout: 3000,
+    //         message: '',
+    //         type: AlertTypes.info,
+    //         onPress: () => { }
+    //     }
+    //     timer: any;
+    //     layoutPanResponder: any;
+    //     offsetMoveY: number = 0;
+    //     prevGestureState: any;
+    //     constructor(props: NotificationProps) {
+    //         super(props);
+    //         this.state = {
+    //             top: new Animated.Value(-maxHeight),
+    //             params: this.initState
+    //         };
+    //         this.layoutPanResponder = PanResponder.create({
+    //             onStartShouldSetPanResponder: () => true,
+    //             onPanResponderMove: (e, gesture) => {
+    //                 if (gesture.dy < 0 && Math.abs(gesture.dy) > 3) {
+    //                     this.offsetMoveY = gesture.dy;
+    //                     this._swiping(gesture.dy);
+    //                 } else {
+    //                     this.offsetMoveY = 0
+    //                 }
+    //             },
+    //             onPanResponderRelease: (e, gesture) => {
+    //                 this.setState({ grant: false })
+    //                 if (Math.abs(this.offsetMoveY) > 10) {
+    //                     this.hide(20);
+    //                 } else {
+    //                     this._swiping(0);
+    //                     if (Math.abs(this.offsetMoveY) < 3) {
+    //                         this.timer = setTimeout(() => { this.hide() }, 100);
+    //                         this.state.params.onPress && this.state.params.onPress();
+    //                     }
+    //                 }
+    //                 this.offsetMoveY = 0;
+    //             },
+    //             onPanResponderGrant: (e, gesture) => {
+    //                 this.setState({ grant: true })
+    //                 clearTimeout(this.timer);
+    //                 this.prevGestureState = {
+    //                     ...gesture,
+    //                     moveX: gesture.x0,
+    //                     moveY: gesture.y0,
+    //                 };
+    //             }
+    //         });
+    //     }
+    //     _swiping(newPos: number) {
+    //         Animated.timing(this.state.top, {
+    //             duration: 0,
+    //             delay: 0,
+    //             toValue: newPos,
+    //         }).start();
+    //     }
+    //     hide(speed = 300) {
+    //         Animated.timing(this.state.top, {
+    //             toValue: -maxHeight,
+    //             duration: speed,
+    //         }).start(() => {
+    //             this.setState({ params: this.initState })
+    //         });
+    //     }
+    //     show(params: NotifyParams) {
+    //         clearTimeout(this.timer);
+    //         this.state.top.setValue(-maxHeight);
+    //         this.setState({ params: { ...this.initState, ...params } }, () => {
+    //             Animated.timing(this.state.top, {
+    //                 toValue: 0,
+    //                 duration: 400,
+    //                 easing: Easing.sin,
+    //             }).start(() => {
+    //                 this.timer = setTimeout(() => { this.hide() }, this.state.params.timeout);
+    //             });
+    //         });
+    //     }
+    //     componentWillUnmount() {
+    //         clearTimeout(this.timer);
+    //     }
+    //     getColor() {
+    //         return this.props.colors![this.state.params.type!];
+    //     }
+    //     /* renderContent() {
+    //         switch (this.state.params.buttons.length) {
+    //             case 0:
+    //                 return <Text style={[
+    //                     style.text
+    //                 ]}>{this.state.params.alert}</Text>;
+    //                 break;
+    //             case 1:
+    //                 return <View style={{ flexDirection: 'row' }}>
+    //                     <Text style={[
+    //                         style.text, { paddingVertical: 5, flex: 1 }
+    //                     ]}>
+    //                         {this.state.params.alert}</Text>
+    //                     <Button
+    //                         {...this.state.params.buttons[0]}
+    //                         hideAlert={() => { clearTimeout(this._timer); this.hide() }}
+    //                     />
+    //                 </View>;
+    //                 break;
+    //             case 2:
+    //                 return this.state.params.buttons.map((item, i) => {
+    //                     return <Button key={i} {...item} hideAlert={() => { clearTimeout(this._timer); this.hide() }} />
+    //                 });
+    //                 break;
+    //         }
+    //         return null;
+    //     } */
+    //     render() {
+    //         const { grant } = this.state;
+    //         const { containerStyle } = this.props;
+    //         return (
+    //             <Animated.View
+    //                 style={[
+    //                     style.container,
+    //                     {
+    //                         maxHeight,
+    //                         minHeight,
+    //                         backgroundColor: this.getColor(),
+    //                         top: this.state.top,
+    //                         opacity: this.state.top.interpolate({
+    //                             inputRange: [-150, 0],
+    //                             outputRange: [0, 1]
+    //                         })
+    //                     },
+    //                     grant && { opacity: .9 },
+    //                     containerStyle
+    //                 ]}
+    //                 {...this.layoutPanResponder.panHandlers}
+    //             >
+    //                 <View
+    //                     style={style.content}
+    //                 >
+    //                     <Text
+    //                         style={[
+    //                             style.text
+    //                         ]}
+    //                     >{this.state.params.message}</Text>
+    //                 </View>
+    //                 <View style={style.swipeButton}></View>
+    //             </Animated.View>
+    //         );
+    //     }
+    // }
     var style = react_native_1.StyleSheet.create({
         container: {
             position: 'absolute',
@@ -235,5 +353,5 @@ define(["require", "exports", "react", "react-native", "./AlertTypes"], function
             alignSelf: 'center'
         }
     });
-    exports.default = Notification;
+    exports.default = React.forwardRef(Notification);
 });

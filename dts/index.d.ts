@@ -1,5 +1,6 @@
 import NotifiacationProvider from "./NotificationProvider";
+import useNotify from "./useNotify";
 import withNotify, { WithNotify } from "./withNotify";
 import { AlertTypes } from "./AlertTypes";
-export { NotifiacationProvider, withNotify, WithNotify, AlertTypes };
+export { NotifiacationProvider, useNotify, AlertTypes, withNotify, WithNotify };
 //# sourceMappingURL=index.d.ts.map

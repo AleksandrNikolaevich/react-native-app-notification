@@ -32,15 +32,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "react", "prop-types", "hoist-non-react-statics"], function (require, exports, React, prop_types_1, hoist_non_react_statics_1) {
+define(["require", "exports", "react", "./context", "hoist-non-react-statics"], function (require, exports, React, context_1, hoist_non_react_statics_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     React = __importStar(React);
-    prop_types_1 = __importDefault(prop_types_1);
     hoist_non_react_statics_1 = __importDefault(hoist_non_react_statics_1);
-    var contextTypes = {
-        showNotify: prop_types_1.default.func
-    };
     var withNotify = function (WrappedComponent) {
         var Wrapper = /** @class */ (function (_super) {
             __extends(Wrapper, _super);
@@ -48,9 +44,9 @@ define(["require", "exports", "react", "prop-types", "hoist-non-react-statics"],
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             Wrapper.prototype.render = function () {
-                return (React.createElement(WrappedComponent, __assign({}, this.props, { notify: this.context.showNotify })));
+                var _this = this;
+                return (React.createElement(context_1.NotifyContext.Consumer, null, function (showNotify) { return (React.createElement(WrappedComponent, __assign({}, _this.props, { notify: showNotify }))); }));
             };
-            Wrapper.contextTypes = contextTypes;
             return Wrapper;
         }(React.PureComponent));
         return hoist_non_react_statics_1.default(Wrapper, WrappedComponent);
