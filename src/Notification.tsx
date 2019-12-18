@@ -15,6 +15,8 @@ import { AlertTypes } from './AlertTypes';
 import { useDefaultProps } from './utils';
 import { NotifyParams } from './types';
 
+export type NotifyParams = NotifyParams;
+
 export type NotificationColors = {
     info?: string,
     success?: string,

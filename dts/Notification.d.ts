@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { ViewStyle } from 'react-native';
+import { NotifyParams } from './types';
+export declare type NotifyParams = NotifyParams;
 export declare type NotificationColors = {
     info?: string;
     success?: string;
