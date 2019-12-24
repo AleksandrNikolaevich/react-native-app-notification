@@ -40,7 +40,7 @@ var Notification = function (props, ref) {
             warn: 'rgb(255, 193, 7)'
         }
     }), colors = _a.colors, containerStyle = _a.containerStyle;
-    var _b = useState(initState.timeout), timeout = _b[0], setShowTimeout = _b[1];
+    var _b = useState({}), other = _b[0], setOtherParams = _b[1];
     var _c = useState(initState.message), message = _c[0], setMessage = _c[1];
     var _d = useState(initState.type), type = _d[0], setType = _d[1];
     var _e = useState(false), grant = _e[0], setGrant = _e[1];
@@ -96,7 +96,6 @@ var Notification = function (props, ref) {
             toValue: -maxHeight,
             duration: speed,
         }).start(function () {
-            setShowTimeout(initState.timeout);
             setMessage(initState.message);
             setType(initState.type);
         });
@@ -105,15 +104,15 @@ var Notification = function (props, ref) {
         onPress = params.onPress;
         clearTimeout(timer);
         top.setValue(-maxHeight);
-        setShowTimeout(params.timeout || initState.timeout);
         setMessage(params.message || initState.message);
         setType(params.type || initState.type);
+        setOtherParams(params.other || {});
         Animated.timing(top, {
             toValue: 0,
             duration: 400,
             easing: Easing.sin,
         }).start(function () {
-            timer = setTimeout(function () { hide(); }, timeout);
+            timer = setTimeout(function () { hide(); }, params.timeout || initState.timeout);
         });
     };
     useImperativeHandle(ref, function () { return ({
@@ -139,10 +138,12 @@ var Notification = function (props, ref) {
             grant && { opacity: .9 },
             containerStyle
         ] }, layoutPanResponder.panHandlers),
-        React.createElement(View, { style: style.content },
-            React.createElement(Text, { style: [
-                    style.text
-                ] }, message)),
+        props.render && props.render({ other: other, message: message, type: type }),
+        !props.render &&
+            React.createElement(View, { style: style.content },
+                React.createElement(Text, { style: [
+                        style.text
+                    ] }, message)),
         React.createElement(View, { style: style.swipeButton })));
 };
 // class Notification extends React.PureComponent<NotificationProps, State> {

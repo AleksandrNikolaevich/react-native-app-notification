@@ -3,5 +3,6 @@ export declare type NotifyParams = {
     message: string;
     type?: "success" | "error" | "warn" | "info";
     onPress?: () => void;
+    other?: any;
 };
 //# sourceMappingURL=types.d.ts.map

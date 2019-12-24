@@ -26,7 +26,8 @@ export type NotificationColors = {
 
 export type NotificationProps = {
     colors?: NotificationColors,
-    containerStyle?: ViewStyle
+    containerStyle?: ViewStyle,
+    render?: (props: NotifyParams) => React.ReactNode
 }
 
 
@@ -71,9 +72,8 @@ const Notification: React.FC<NotificationProps> = (props, ref) => {
             warn: 'rgb(255, 193, 7)'
         }
     });
-    
 
-    const [timeout, setShowTimeout] = useState(initState.timeout);
+    const [other, setOtherParams] = useState({});
     const [message, setMessage] = useState(initState.message);
     const [type, setType] = useState(initState.type);
     const [grant, setGrant] = useState(false);
@@ -139,7 +139,6 @@ const Notification: React.FC<NotificationProps> = (props, ref) => {
             toValue: -maxHeight,
             duration: speed,
         }).start(() => {
-            setShowTimeout(initState.timeout);
             setMessage(initState.message);
             setType(initState.type);
         });
@@ -149,25 +148,24 @@ const Notification: React.FC<NotificationProps> = (props, ref) => {
         onPress = params.onPress;
         clearTimeout(timer);
         top.setValue(-maxHeight);
-        setShowTimeout(params.timeout || initState.timeout);
         setMessage(params.message || initState.message);
         setType(params.type || initState.type);
-
+        setOtherParams(params.other || {})
         Animated.timing(top, {
             toValue: 0,
             duration: 400,
             easing: Easing.sin,
         }).start(() => {
-            timer = setTimeout(() => { hide() }, timeout);
+            timer = setTimeout(() => { hide() }, params.timeout || initState.timeout);
         });
 
     }
 
     useImperativeHandle(ref, () => ({
         show: (params: NotifyParams) => {
-          show(params);
+            show(params);
         }
-      }));
+    }));
 
     const getColor = () => {
         return colors![type!];
@@ -192,15 +190,21 @@ const Notification: React.FC<NotificationProps> = (props, ref) => {
             ]}
             {...layoutPanResponder.panHandlers}
         >
-            <View
-                style={style.content}
-            >
-                <Text
-                    style={[
-                        style.text
-                    ]}
-                >{message}</Text>
-            </View>
+            {
+                props.render && props.render({other, message, type})
+            }
+            {
+                !props.render &&
+                <View
+                    style={style.content}
+                >
+                    <Text
+                        style={[
+                            style.text
+                        ]}
+                    >{message}</Text>
+                </View>
+            }
             <View style={style.swipeButton}></View>
         </Animated.View>
     );
@@ -433,4 +437,4 @@ const style = StyleSheet.create({
 });
 
 
-export default React.forwardRef(Notification) ;
+export default React.forwardRef(Notification);

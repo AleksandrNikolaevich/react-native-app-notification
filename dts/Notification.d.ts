@@ -11,6 +11,7 @@ export declare type NotificationColors = {
 export declare type NotificationProps = {
     colors?: NotificationColors;
     containerStyle?: ViewStyle;
+    render?: (props: NotifyParams) => React.ReactNode;
 };
 declare const _default: React.ForwardRefExoticComponent<NotificationProps & React.RefAttributes<unknown>>;
 export default _default;
